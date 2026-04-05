@@ -942,8 +942,8 @@ function toggleMenu() {
   btn.classList.toggle('open', open);
 }
 function closeMenu() {
-  document.getElementById('mobileMenu').classList.remove('open');
-  document.getElementById('hamburger').classList.remove('open');
+  document.getElementById('mobileMenu')?.classList.remove('open');
+  document.getElementById('hamburger')?.classList.remove('open');
 }
 
 // ── Scroll shadow ─────────────────────────────────────────────
