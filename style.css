@@ -592,9 +592,9 @@ img { max-width: 100%; display: block }
 
 /* Top bar */
 .pdf-viewer-bar {
-  display: flex; align-items: center; gap: .5rem;
-  padding: 0 .85rem;
-  height: 52px; flex-shrink: 0;
+  display: flex; align-items: center; gap: .4rem;
+  padding: 0 .75rem;
+  height: 54px; flex-shrink: 0;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding-top: var(--safe-top);
@@ -616,6 +616,27 @@ img { max-width: 100%; display: block }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   text-align: center; padding: 0 .4rem;
 }
+
+/* Icon action buttons in topbar */
+.pdf-icon-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 9px;
+  border: 1.5px solid var(--border); background: var(--surface2);
+  font-size: 1rem; color: var(--text2);
+  flex-shrink: 0; transition: var(--t); cursor: pointer;
+  text-decoration: none;
+}
+.pdf-icon-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft) }
+.pdf-icon-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft) }
+.pdf-icon-btn:disabled { opacity: .4; cursor: not-allowed }
+
+/* Download button — green tint */
+.pdf-dl-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-soft) }
+
+/* Fullscreen button */
+.pdf-fs-btn.is-fullscreen { border-color: var(--accent); color: var(--accent); background: var(--accent-soft) }
+
+/* Old ext-btn kept for compat */
 .pdf-ext-btn {
   display: flex; align-items: center; gap: .2rem;
   padding: .38rem .7rem; border-radius: 9px;
@@ -635,6 +656,7 @@ img { max-width: 100%; display: block }
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   transition: opacity .25s;
+  flex-wrap: wrap;
 }
 .pdf-ctrl-btn {
   min-width: 34px; height: 34px; padding: 0 .6rem;
@@ -656,6 +678,11 @@ img { max-width: 100%; display: block }
 }
 .pdf-page-sep { color: var(--text3) }
 
+/* Rotation badge */
+.pdf-rotate-group {
+  display: flex; align-items: center; gap: .28rem;
+}
+
 .pdf-zoom-group {
   display: flex; align-items: center; gap: .28rem;
   margin-left: auto;
@@ -672,18 +699,24 @@ img { max-width: 100%; display: block }
   display: flex; flex-direction: column;
   align-items: center;
   padding: 1rem .75rem 2rem;
-  background: #4a4a4a;
+  background: #3a3a3a;
   -webkit-overflow-scrolling: touch;
   gap: 1rem;
 }
-[data-theme="dark"] .pdf-canvas-wrap { background: #1a1a1a }
+[data-theme="dark"] .pdf-canvas-wrap { background: #111 }
 
 #pdfCanvas {
   display: none;
-  box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  box-shadow: 0 4px 28px rgba(0,0,0,.5);
   border-radius: 3px;
   max-width: 100%;
+  transition: transform .3s ease;
 }
+
+/* Fullscreen mode override */
+.pdf-viewer-wrap:-webkit-full-screen { background: #111 }
+.pdf-viewer-wrap:-moz-full-screen { background: #111 }
+.pdf-viewer-wrap:fullscreen { background: #111 }
 
 /* Loading state */
 .pdf-loading {
@@ -788,10 +821,45 @@ img { max-width: 100%; display: block }
 /* Tablet */
 @media(min-width:768px) and (max-width:1024px) {
   .subjects-grid { grid-template-columns: repeat(3,1fr) }
+  .pdf-list { grid-template-columns: repeat(2,1fr) }
 }
 
-/* Desktop */
+/* Desktop / Laptop */
 @media(min-width:1025px) {
-  .subjects-grid { grid-template-columns: repeat(4,1fr); gap: 1.2rem }
+  /* Layout */
   .hero { padding: 5rem 1.5rem }
+  .container { max-width: 1200px }
+
+  /* Subjects */
+  .subjects-grid { grid-template-columns: repeat(4,1fr); gap: 1.2rem }
+  .subjects-header { position: sticky; top: var(--nav-h); z-index: 100 }
+
+  /* PDF panels — wider layout */
+  .pdf-list { grid-template-columns: repeat(3,1fr); gap: 1rem }
+  .pdf-card { padding: 1rem 1.1rem }
+  .pdf-name { font-size: .88rem; white-space: normal; word-break: break-word;
+               overflow: visible; text-overflow: unset; line-height: 1.4 }
+
+  /* Subject detail — two column layout on wide screens */
+  #page-subject .container { max-width: 1200px }
+  #pdfPanels { padding-bottom: 4rem }
+
+  /* Navbar desktop tweaks */
+  .nav-inner { padding: 0 2rem }
+  .nav-links { gap: .4rem }
+  .nav-link { font-size: .9rem; padding: .42rem 1rem }
+
+  /* About grid */
+  .about-grid { gap: 1.5rem }
+  .about-card { padding: 1.6rem }
+
+  /* Section tabs */
+  .section-tabs { gap: .5rem; margin: 1.5rem 0 1.75rem }
+  .tab-btn { padding: .65rem 1.3rem; font-size: .88rem }
+}
+
+/* Large desktop */
+@media(min-width:1400px) {
+  .pdf-list { grid-template-columns: repeat(4,1fr) }
+  .subjects-grid { grid-template-columns: repeat(5,1fr) }
 }
