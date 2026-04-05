@@ -823,6 +823,8 @@ function openPdfViewer(href, title, e) {
 
   // UI setup
   _pdfEl('pdfViewerTitle').textContent = title || 'PDF';
+  const sub = _pdfEl('pdfViewerSubtitle');
+  if (sub) sub.textContent = href.split('/').pop().replace('.pdf','').replace(/[-_]/g,' ') || 'Document';
   _pdfEl('pdfViewerExtLink').href      = href;
   _pdfEl('pdfErrLink').href            = href;
   _pdfEl('pdfPageNum').textContent     = '—';
