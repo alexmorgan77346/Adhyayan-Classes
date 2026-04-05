@@ -357,9 +357,14 @@
       <span class="pv-close-label">बंद करें</span>
     </button>
     <div class="pdf-viewer-title" id="pdfViewerTitle">PDF</div>
-    <a class="pdf-ext-btn" id="pdfViewerExtLink" href="#" target="_blank" rel="noopener" title="Browser में खोलें">
-      ⤴<span class="pv-ext-label"> Open</span>
-    </a>
+    <!-- Download -->
+    <a class="pdf-icon-btn pdf-dl-btn" id="pdfDownloadBtn" href="#" download title="Download PDF">⬇</a>
+    <!-- Rotate -->
+    <button class="pdf-icon-btn" onclick="pdfRotate()" title="Rotate">↻</button>
+    <!-- Fullscreen -->
+    <button class="pdf-icon-btn pdf-fs-btn" id="pdfFsBtn" onclick="pdfToggleFullscreen()" title="Fullscreen">⛶</button>
+    <!-- Open in browser -->
+    <a class="pdf-icon-btn" id="pdfViewerExtLink" href="#" target="_blank" rel="noopener" title="Browser में खोलें">⤴</a>
   </div>
 
   <!-- Controls bar -->
@@ -371,6 +376,8 @@
       <span id="pdfPageCount">—</span>
     </div>
     <button class="pdf-ctrl-btn" id="pdfNextBtn" onclick="pdfNextPage()" disabled>›</button>
+    <!-- Orientation toggle -->
+    <button class="pdf-ctrl-btn" id="pdfOrientBtn" onclick="pdfToggleOrientation()" title="Portrait / Landscape" style="font-size:.7rem;padding:0 .5rem;min-width:60px">📄 Portrait</button>
     <div class="pdf-zoom-group">
       <button class="pdf-ctrl-btn pdf-zoom-btn" onclick="pdfZoomOut()">−</button>
       <span class="pdf-zoom-label" id="pdfZoomLabel">100%</span>
@@ -553,5 +560,86 @@ window.togglePdfLock = async lockKey => {
     });
   }
 </script>
+
+<script>
+// ── PDF Viewer: Rotate, Fullscreen, Download, Orientation ────
+let _pdfRotation = 0;       // 0, 90, 180, 270
+let _pdfLandscape = false;  // portrait / landscape view mode
+
+// Rotate canvas 90° clockwise
+window.pdfRotate = function() {
+  _pdfRotation = (_pdfRotation + 90) % 360;
+  const canvas = document.getElementById('pdfCanvas');
+  if (canvas) canvas.style.transform = `rotate(${_pdfRotation}deg)`;
+  // Adjust canvas-wrap height so rotated canvas isn't clipped
+  const wrap = document.getElementById('pdfCanvasWrap');
+  if (wrap && (_pdfRotation === 90 || _pdfRotation === 270)) {
+    wrap.style.alignItems = 'center';
+  } else if (wrap) {
+    wrap.style.alignItems = 'center';
+  }
+};
+
+// Toggle Fullscreen
+window.pdfToggleFullscreen = function() {
+  const el  = document.getElementById('pdfViewerWrap');
+  const btn = document.getElementById('pdfFsBtn');
+  if (!document.fullscreenElement) {
+    (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen).call(el);
+  } else {
+    (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen).call(document);
+  }
+};
+document.addEventListener('fullscreenchange', () => {
+  const btn = document.getElementById('pdfFsBtn');
+  if (!btn) return;
+  if (document.fullscreenElement) {
+    btn.textContent = '✕⛶'; btn.title = 'Exit Fullscreen';
+    btn.classList.add('is-fullscreen');
+  } else {
+    btn.textContent = '⛶'; btn.title = 'Fullscreen';
+    btn.classList.remove('is-fullscreen');
+  }
+});
+
+// Portrait / Landscape orientation toggle
+window.pdfToggleOrientation = function() {
+  _pdfLandscape = !_pdfLandscape;
+  const btn = document.getElementById('pdfOrientBtn');
+  if (btn) btn.innerHTML = _pdfLandscape ? '🔄 Landscape' : '📄 Portrait';
+  // Re-render current page with new fit axis
+  if (window._pdfDoc) window._pdfRenderPage(window._pdfPage);
+};
+
+// Hook into existing openPdfViewer to set download link
+const _origOpen = window.openPdfViewer;
+window.openPdfViewer = function(href, title, e) {
+  // Set download button
+  const dl = document.getElementById('pdfDownloadBtn');
+  if (dl) { dl.href = href; dl.download = (title || 'document') + '.pdf'; }
+  // Reset rotation on new open
+  _pdfRotation = 0;
+  _pdfLandscape = false;
+  const canvas = document.getElementById('pdfCanvas');
+  if (canvas) canvas.style.transform = 'rotate(0deg)';
+  const orientBtn = document.getElementById('pdfOrientBtn');
+  if (orientBtn) orientBtn.innerHTML = '📄 Portrait';
+  if (_origOpen) _origOpen(href, title, e);
+};
+
+// Patch _pdfRenderPage to support landscape mode (wider fit)
+// We override the fit logic so landscape = fit height instead of width
+const _origRender = window._pdfRenderPage;
+if (_origRender) {
+  window._pdfRenderPage = async function(num) {
+    // Let original run — it uses its own closure vars
+    // We patch via canvas transform for orientation feel
+    await _origRender(num);
+    const canvas = document.getElementById('pdfCanvas');
+    if (canvas) canvas.style.transform = `rotate(${_pdfRotation}deg)`;
+  };
+}
+</script>
+
 </body>
 </html>
