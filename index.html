@@ -352,50 +352,73 @@
 
   <!-- Top bar -->
   <div class="pdf-viewer-bar">
-    <button class="pdf-close-btn" onclick="closePdfViewer()" aria-label="Close">
-      <span>✕</span>
-      <span class="pv-close-label">बंद करें</span>
+    <button class="pv-back-btn" onclick="closePdfViewer()" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
-    <div class="pdf-viewer-title" id="pdfViewerTitle">PDF</div>
-    <!-- Download -->
-    <a class="pdf-icon-btn pdf-dl-btn" id="pdfDownloadBtn" href="#" download title="Download PDF">⬇</a>
-    <!-- Rotate -->
-    <button class="pdf-icon-btn" onclick="pdfRotate()" title="Rotate">↻</button>
-    <!-- Fullscreen -->
-    <button class="pdf-icon-btn pdf-fs-btn" id="pdfFsBtn" onclick="pdfToggleFullscreen()" title="Fullscreen">⛶</button>
-    <!-- Open in browser -->
-    <a class="pdf-icon-btn" id="pdfViewerExtLink" href="#" target="_blank" rel="noopener" title="Browser में खोलें">⤴</a>
+    <div class="pv-title-wrap">
+      <div class="pv-title" id="pdfViewerTitle">PDF</div>
+      <div class="pv-subtitle" id="pdfViewerSubtitle">Document</div>
+    </div>
+    <div class="pv-bar-actions">
+      <a class="pv-action-btn pv-dl" id="pdfDownloadBtn" href="#" download title="Download">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </a>
+      <button class="pv-action-btn" onclick="pdfRotate()" title="Rotate">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      </button>
+      <button class="pv-action-btn pv-fs-btn" id="pdfFsBtn" onclick="pdfToggleFullscreen()" title="Fullscreen">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+      </button>
+      <a class="pv-action-btn" id="pdfViewerExtLink" href="#" target="_blank" rel="noopener" title="Browser में खोलें">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </div>
   </div>
 
   <!-- Controls bar -->
   <div class="pdf-controls-bar" id="pdfControlsBar">
-    <button class="pdf-ctrl-btn" id="pdfPrevBtn" onclick="pdfPrevPage()" disabled>‹</button>
-    <div class="pdf-page-info">
-      <span id="pdfPageNum">—</span>
-      <span class="pdf-page-sep">/</span>
-      <span id="pdfPageCount">—</span>
+    <div class="pv-nav-group">
+      <button class="pv-nav-btn" id="pdfPrevBtn" onclick="pdfPrevPage()" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="pv-page-pill">
+        <span id="pdfPageNum">—</span>
+        <span class="pv-sep">/</span>
+        <span id="pdfPageCount">—</span>
+      </div>
+      <button class="pv-nav-btn" id="pdfNextBtn" onclick="pdfNextPage()" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
-    <button class="pdf-ctrl-btn" id="pdfNextBtn" onclick="pdfNextPage()" disabled>›</button>
-    <!-- Orientation toggle -->
-    <button class="pdf-ctrl-btn" id="pdfOrientBtn" onclick="pdfToggleOrientation()" title="Portrait / Landscape" style="font-size:.7rem;padding:0 .5rem;min-width:60px">📄 Portrait</button>
-    <div class="pdf-zoom-group">
-      <button class="pdf-ctrl-btn pdf-zoom-btn" onclick="pdfZoomOut()">−</button>
-      <span class="pdf-zoom-label" id="pdfZoomLabel">100%</span>
-      <button class="pdf-ctrl-btn pdf-zoom-btn" onclick="pdfZoomIn()">+</button>
+    <button class="pv-orient-btn" id="pdfOrientBtn" onclick="pdfToggleOrientation()" title="Portrait / Landscape">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      <span id="pdfOrientLabel">Portrait</span>
+    </button>
+    <div class="pv-zoom-group">
+      <button class="pv-zoom-btn" onclick="pdfZoomOut()">−</button>
+      <span class="pv-zoom-label" id="pdfZoomLabel">100%</span>
+      <button class="pv-zoom-btn" onclick="pdfZoomIn()">+</button>
     </div>
   </div>
 
   <!-- Canvas scroll area -->
   <div class="pdf-canvas-wrap" id="pdfCanvasWrap">
     <div class="pdf-loading" id="pdfLoading">
-      <div class="pdf-spinner"></div>
-      <div class="pdf-loading-text">PDF लोड हो रही है…</div>
+      <div class="pv-loader-ring">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="pdf-loading-text">Loading PDF…</div>
     </div>
     <div class="pdf-load-error" id="pdfLoadError">
-      <div class="pdf-err-icon">⚠️</div>
+      <div class="pv-err-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
       <div class="pdf-err-title">PDF नहीं खुली</div>
       <div class="pdf-err-sub">File मिली नहीं या network error।</div>
-      <a class="pvf-open-btn" id="pdfErrLink" href="#" target="_blank" rel="noopener">🌐 Browser में खोलें</a>
+      <a class="pvf-open-btn" id="pdfErrLink" href="#" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Browser में खोलें
+      </a>
     </div>
     <canvas id="pdfCanvas"></canvas>
   </div>
@@ -594,10 +617,10 @@ document.addEventListener('fullscreenchange', () => {
   const btn = document.getElementById('pdfFsBtn');
   if (!btn) return;
   if (document.fullscreenElement) {
-    btn.textContent = '✕⛶'; btn.title = 'Exit Fullscreen';
+    btn.title = 'Exit Fullscreen';
     btn.classList.add('is-fullscreen');
   } else {
-    btn.textContent = '⛶'; btn.title = 'Fullscreen';
+    btn.title = 'Fullscreen';
     btn.classList.remove('is-fullscreen');
   }
 });
@@ -606,7 +629,9 @@ document.addEventListener('fullscreenchange', () => {
 window.pdfToggleOrientation = function() {
   _pdfLandscape = !_pdfLandscape;
   const btn = document.getElementById('pdfOrientBtn');
-  if (btn) btn.innerHTML = _pdfLandscape ? '🔄 Landscape' : '📄 Portrait';
+  const lbl = document.getElementById('pdfOrientLabel');
+  if (lbl) lbl.textContent = _pdfLandscape ? 'Landscape' : 'Portrait';
+  if (btn) btn.classList.toggle('active', _pdfLandscape);
   // Re-render current page with new fit axis
   if (window._pdfDoc) window._pdfRenderPage(window._pdfPage);
 };
@@ -623,7 +648,9 @@ window.openPdfViewer = function(href, title, e) {
   const canvas = document.getElementById('pdfCanvas');
   if (canvas) canvas.style.transform = 'rotate(0deg)';
   const orientBtn = document.getElementById('pdfOrientBtn');
-  if (orientBtn) orientBtn.innerHTML = '📄 Portrait';
+  const orientLbl = document.getElementById('pdfOrientLabel');
+  if (orientLbl) orientLbl.textContent = 'Portrait';
+  if (orientBtn) orientBtn.classList.remove('active');
   if (_origOpen) _origOpen(href, title, e);
 };
 
