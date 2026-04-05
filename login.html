@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="light" data-lang="hi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+  <title>Adhyayan Classes</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" id="themeColorMeta" content="#f6f4ef"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="Adhyayan"/>
+  <link rel="apple-touch-icon" href="icons/icon-192.png"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- ═══════════ LOADER ═══════════ -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-logo">अ</div>
+    <div class="loader-text">Adhyayan Classes</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+</div>
+
+<!-- ═══════════ FULLSCREEN SIDEBAR ═══════════ -->
+<div id="sidebarOverlay" onclick="closeSidebar()"></div>
+<aside id="sidebar">
+  <!-- Top identity section -->
+  <div class="sb-top">
+    <div class="sb-brand">
+      <span class="sb-logo-mark">अ</span>
+      <div>
+        <div class="sb-app-name">Adhyayan Classes</div>
+        <div class="sb-app-sub">Class 11 &amp; 12 Platform</div>
+      </div>
+    </div>
+    <button class="sb-close" onclick="closeSidebar()" aria-label="Close">✕</button>
+  </div>
+
+  <!-- User badge (injected by auth) -->
+  <div id="sbUserBadge" class="sb-user-badge" style="display:none">
+    <div class="sb-avatar" id="sbAvatar">U</div>
+    <div class="sb-user-info">
+      <div class="sb-user-email" id="sbEmail">user@email.com</div>
+      <div class="sb-role-tag" id="sbRole">🎓 Student</div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sb-nav">
+    <div class="sb-section-label">Navigation</div>
+    <button class="sb-nav-item active" id="sbn-home" onclick="navigate('home');closeSidebar()">
+      <span class="sb-nav-icon">🏠</span>
+      <span data-hi="होम" data-en="Home">होम</span>
+    </button>
+    <button class="sb-nav-item" id="sbn-subjects" onclick="navigate('subjects');closeSidebar()">
+      <span class="sb-nav-icon">📚</span>
+      <span data-hi="विषय" data-en="Subjects">विषय</span>
+    </button>
+  </nav>
+
+  <!-- Actions -->
+  <div class="sb-actions">
+    <div class="sb-section-label">Options</div>
+    <button class="sb-action-item" onclick="openModal('helpModal');closeSidebar()">
+      <span class="sb-action-icon">❓</span>
+      <div>
+        <div class="sb-action-label" data-hi="सहायता" data-en="Help">सहायता</div>
+        <div class="sb-action-sub">Get help &amp; contact</div>
+      </div>
+    </button>
+    <button class="sb-action-item" onclick="openModal('settingsModal');closeSidebar()">
+      <span class="sb-action-icon">⚙️</span>
+      <div>
+        <div class="sb-action-label" data-hi="सेटिंग्स" data-en="Settings">सेटिंग्स</div>
+        <div class="sb-action-sub">Theme, language, class</div>
+      </div>
+    </button>
+    <!-- Logout (injected by auth, hidden by default) -->
+    <button class="sb-action-item sb-logout" id="sbLogoutBtn" style="display:none" onclick="window.doSidebarLogout&&window.doSidebarLogout()">
+      <span class="sb-action-icon">⏏️</span>
+      <div>
+        <div class="sb-action-label">Logout</div>
+        <div class="sb-action-sub">Sign out of your account</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- Bottom -->
+  <div class="sb-footer">
+    <span>Adhyayan Classes</span>
+    <span class="sb-version">v3.0 · PWA</span>
+  </div>
+</aside>
+
+<!-- ═══════════ HELP MODAL ═══════════ -->
+<div class="modal-overlay" id="helpModal" onclick="closeModal('helpModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-row"><span class="modal-icon">❓</span><h3 class="modal-title" data-hi="सहायता" data-en="Help">सहायता</h3></div>
+      <button class="modal-close" onclick="closeModal('helpModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="help-item"><div class="help-icon">🎓</div><div><strong data-hi="कक्षा कैसे चुनें?" data-en="How to choose class?">कक्षा कैसे चुनें?</strong><p data-hi="विषय पेज पर ऊपर 11वीं / 12वीं / JEE / NEET बटन दबाएं।" data-en="On Subjects page, tap 11th / 12th / JEE / NEET button at the top.">विषय पेज पर ऊपर 11वीं / 12वीं / JEE / NEET बटन दबाएं।</p></div></div>
+      <div class="help-item"><div class="help-icon">📄</div><div><strong data-hi="PDF कैसे खोलें?" data-en="How to open PDF?">PDF कैसे खोलें?</strong><p data-hi="किसी भी PDF कार्ड पर टैप करें — App के अंदर खुलेगा।" data-en="Tap any PDF card — it opens inside the app.">किसी भी PDF कार्ड पर टैप करें — App के अंदर खुलेगा।</p></div></div>
+      <div class="help-item"><div class="help-icon">📲</div><div><strong data-hi="App Install करें" data-en="Install as App">App Install करें</strong><p data-hi="Android: Chrome ⋮ → Add to Home Screen। iPhone: Share → Add to Home Screen।" data-en="Android: Chrome ⋮ → Add to Home Screen. iPhone: Share → Add to Home Screen.">Android: Chrome ⋮ → Add to Home Screen।</p></div></div>
+      <div class="help-item"><div class="help-icon">📞</div><div><strong data-hi="संपर्क" data-en="Contact">संपर्क</strong><p><a href="tel:6205034322">6205034322</a> / <a href="tel:7004904286">70049 04286</a></p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SETTINGS MODAL ═══════════ -->
+<div class="modal-overlay" id="settingsModal" onclick="closeModal('settingsModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-row"><span class="modal-icon">⚙️</span><h3 class="modal-title" data-hi="सेटिंग्स" data-en="Settings">सेटिंग्स</h3></div>
+      <button class="modal-close" onclick="closeModal('settingsModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-label" data-hi="डार्क मोड" data-en="Dark Mode">डार्क मोड</div>
+          <div class="setting-sub" data-hi="आंखों के लिए आरामदायक" data-en="Easier on the eyes">आंखों के लिए आरामदायक</div>
+        </div>
+        <button class="toggle-pill" id="darkPill" onclick="toggleDark()"><span class="pill-knob"></span></button>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-label" data-hi="भाषा" data-en="Language">भाषा</div>
+          <div class="setting-sub" data-hi="हिंदी या English" data-en="Hindi or English">हिंदी या English</div>
+        </div>
+        <div class="lang-pill-wrap">
+          <button class="lang-pill active" id="pillHi" onclick="setLang('hi')">हिं</button>
+          <button class="lang-pill" id="pillEn" onclick="setLang('en')">EN</button>
+        </div>
+      </div>
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:.6rem">
+        <div class="setting-info">
+          <div class="setting-label" data-hi="डिफ़ॉल्ट कक्षा" data-en="Default Class">डिफ़ॉल्ट कक्षा</div>
+          <div class="setting-sub" data-hi="विषय पेज पर पहले कौन सी कक्षा दिखे" data-en="Which class appears first on Subjects page">विषय पेज पर पहले कौन सी कक्षा दिखे</div>
+        </div>
+        <div class="setting-class-grid" id="settingClassGrid">
+          <button class="scg-btn active" data-class="11"   onclick="setDefaultClass(this,'11')">11वीं</button>
+          <button class="scg-btn"        data-class="12"   onclick="setDefaultClass(this,'12')">12वीं</button>
+          <button class="scg-btn"        data-class="jee"  onclick="setDefaultClass(this,'jee')">JEE</button>
+          <button class="scg-btn"        data-class="neet" onclick="setDefaultClass(this,'neet')">NEET</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-label" data-hi="Cache साफ़ करें" data-en="Clear Cache">Cache साफ़ करें</div>
+          <div class="setting-sub" data-hi="Offline data हटाएं" data-en="Remove offline data">Offline data हटाएं</div>
+        </div>
+        <button class="btn-danger-sm" onclick="clearCache()"><span data-hi="साफ़ करें" data-en="Clear">साफ़ करें</span></button>
+      </div>
+      <div class="settings-app-info">
+        <span>Adhyayan Classes</span>
+        <span class="app-version">v3.1 · PWA</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ NAVBAR (slim) ═══════════ -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <button class="hamburger" id="hamburger" onclick="openSidebar()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-brand" onclick="navigate('home')">
+      <span class="brand-mark">अ</span>
+      <span class="brand-name">Adhyayan</span>
+    </div>
+    <!-- nav-links kept for desktop -->
+    <div class="nav-links">
+      <a class="nav-link active" data-page="home"     onclick="navigate('home')"     data-hi="होम"  data-en="Home">होम</a>
+      <a class="nav-link"        data-page="subjects" onclick="navigate('subjects')" data-hi="विषय" data-en="Subjects">विषय</a>
+    </div>
+    <!-- Only menu button on right — no more icon buttons in topbar -->
+    <div class="nav-actions"></div>
+  </div>
+</nav>
+
+<!-- ═══════════ PDF VIEWER (fullscreen in-app) ═══════════ -->
+<div id="pdfViewer" class="pdf-viewer-overlay">
+  <div class="pdf-viewer-topbar">
+    <button class="pdf-viewer-back" onclick="closePdfViewer()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span data-hi="वापस" data-en="Back">वापस</span>
+    </button>
+    <div class="pdf-viewer-title" id="pdfViewerTitle">PDF</div>
+    <a class="pdf-viewer-open" id="pdfViewerExtLink" href="#" target="_blank" rel="noopener" title="Open in browser">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    </a>
+  </div>
+  <div class="pdf-viewer-body">
+    <iframe id="pdfViewerFrame" src="" allowfullscreen title="PDF Viewer"></iframe>
+    <div class="pdf-viewer-fallback" id="pdfViewerFallback">
+      <div class="pvf-icon">📄</div>
+      <div class="pvf-msg" id="pvfMsg">PDF load हो रहा है…</div>
+      <a class="pvf-btn" id="pvfLink" href="#" target="_blank" rel="noopener">Browser में खोलें →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MAIN APP ═══════════ -->
+<main id="app">
+
+  <!-- ── HOME ── -->
+  <div id="page-home" class="page active">
+    <section class="hero">
+      <div class="hero-bg">
+        <div class="hero-orb orb-1"></div>
+        <div class="hero-orb orb-2"></div>
+        <div class="grid-lines"></div>
+      </div>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          <span data-hi="अध्ययन क्लासेज · Class 11 &amp; 12" data-en="Adhyayan Classes · Class 11 &amp; 12">अध्ययन क्लासेज · Class 11 &amp; 12</span>
+        </div>
+        <h1 class="hero-title">
+          <span class="title-serif" data-hi="सीखे हंसते खेलते" data-en="Learn with Joy">सीखे हंसते खेलते</span>
+          <span class="title-main" data-hi="अध्ययन क्लासेज" data-en="Adhyayan Classes">अध्ययन क्लासेज</span>
+        </h1>
+        <p class="hero-sub" data-hi="आपकी लगन + हमारी मेहनत = कामयाबी" data-en="Your Dedication + Our Hardwork = Success">आपकी लगन + हमारी मेहनत = कामयाबी</p>
+        <div class="hero-cta">
+          <button class="btn-primary" onclick="navigate('subjects')" data-hi="विषय देखें →" data-en="Browse Subjects →">विषय देखें →</button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><span class="stat-num">6</span><span class="stat-lbl" data-hi="विषय" data-en="Subjects">विषय</span></div>
+          <div class="stat-divider"></div>
+          <div class="stat"><span class="stat-num">4</span><span class="stat-lbl" data-hi="कक्षाएं" data-en="Classes">कक्षाएं</span></div>
+          <div class="stat-divider"></div>
+          <div class="stat"><span class="stat-num" data-hi="मुफ़्त" data-en="Free">मुफ़्त</span><span class="stat-lbl" data-hi="हमेशा" data-en="Always">हमेशा</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <div class="container">
+        <div class="section-hdr">
+          <h2 class="section-title" data-hi="हमारे बारे में" data-en="About Us">हमारे बारे में</h2>
+        </div>
+        <div class="tagline-banner">
+          <span data-hi="✨ आपकी लगन + हमारी मेहनत = कामयाबी ✨" data-en="✨ Your Dedication + Our Hardwork = Success ✨">✨ आपकी लगन + हमारी मेहनत = कामयाबी ✨</span>
+        </div>
+        <div class="about-grid">
+          <div class="about-card">
+            <div class="about-card-hdr">
+              <div class="about-big-icon">🏫</div>
+              <div>
+                <div class="about-card-title" data-hi="अध्ययन क्लासेज" data-en="Adhyayan Classes">अध्ययन क्लासेज</div>
+                <div class="about-card-sub" data-hi="बेगूसराय, बिहार" data-en="Begusarai, Bihar">बेगूसराय, बिहार</div>
+              </div>
+            </div>
+            <div class="about-motto" data-hi="सीखे हंसते खेलते" data-en="Learn with Joy">सीखे हंसते खेलते</div>
+            <div class="info-rows">
+              <div class="info-row"><span class="ir-icon">📞</span><div><div class="ir-label" data-hi="मोबाइल" data-en="Mobile">मोबाइल</div><div class="ir-val"><a href="tel:6205034322">6205034322</a> / <a href="tel:7004904286">70049 04286</a></div></div></div>
+              <div class="info-row"><span class="ir-icon">📚</span><div><div class="ir-label" data-hi="कक्षाएं" data-en="Classes">कक्षाएं</div><div class="ir-val">11th &amp; 12th — PHY · CHEM · BIO · MATHS · HIN · ENG</div></div></div>
+              <div class="info-row"><span class="ir-icon">🎓</span><div><div class="ir-label" data-hi="नामांकन" data-en="Admission">नामांकन</div><div class="ir-val" style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap"><span class="admission-badge" data-hi="खुला है" data-en="OPEN">खुला है</span><span data-hi="12वीं नया बैच: 02-01-2026" data-en="12th New Batch: 02-01-2026">12वीं नया बैच: 02-01-2026</span></div></div></div>
+              <div class="info-row"><span class="ir-icon">📍</span><div><div class="ir-label" data-hi="पता" data-en="Address">पता</div><div class="ir-val" data-hi="पुरानी दुर्गा स्थान, बलिया बाजार, बेगूसराय — 851211" data-en="Purani Durga Sthan, Baliya Bazar, Begusarai — 851211">पुरानी दुर्गा स्थान, बलिया बाजार, बेगूसराय — 851211</div></div></div>
+            </div>
+            <a href="https://maps.google.com/?q=Baliya+Bazar+Begusarai+Bihar" target="_blank" class="map-btn">📍 <span data-hi="Google Maps पर देखें" data-en="View on Maps">Google Maps पर देखें</span></a>
+          </div>
+          <div class="about-right-col">
+            <div class="about-card">
+              <div class="result-hdr"><span class="trophy-icon">🏆</span><div><div class="about-card-title" data-hi="2025 परिणाम" data-en="2025 Results">2025 परिणाम</div><div class="about-card-sub" data-hi="हमारे टॉपर्स" data-en="Our Toppers">हमारे टॉपर्स</div></div></div>
+              <div class="toppers-list">
+                <div class="topper-row"><div class="topper-rank gold">1</div><div class="topper-info"><div class="topper-name">Shivam Kumar</div><div class="topper-score" data-hi="नं॰ 458" data-en="No. 458">नं॰ 458</div></div><div class="topper-medal">🥇</div></div>
+                <div class="topper-row"><div class="topper-rank silver">2</div><div class="topper-info"><div class="topper-name">Md Adil</div><div class="topper-score" data-hi="नं॰ 455" data-en="No. 455">नं॰ 455</div></div><div class="topper-medal">🥈</div></div>
+              </div>
+            </div>
+            <div class="about-card">
+              <div class="about-card-title" style="margin-bottom:.9rem" data-hi="आगाज़ 2.0 — हमारी टीम" data-en="Aagaaz 2.0 — Our Team">आगाज़ 2.0 — हमारी टीम</div>
+              <div class="team-list">
+                <div class="team-row"><div class="team-avatar av-orange">S</div><div><div class="team-name">Shayan Akhtar</div><div class="team-role">D.R. — Director</div></div></div>
+                <div class="team-row"><div class="team-avatar av-blue">M</div><div><div class="team-name">Mohit Kumar</div><div class="team-role">M.D. — Managing Director</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── SUBJECTS ── -->
+  <div id="page-subjects" class="page">
+    <div class="subjects-header">
+      <div class="container">
+        <h1 class="page-title" data-hi="विषय" data-en="Subjects">विषय</h1>
+        <div class="class-tabs-row">
+          <button class="ctab active" data-class="11"   onclick="switchClass(this,'11')">
+            <span class="ctab-num">11<sup data-hi="वीं" data-en="th">वीं</sup></span>
+            <span class="ctab-lbl" data-hi="बोर्ड" data-en="Board">बोर्ड</span>
+          </button>
+          <button class="ctab" data-class="12"   onclick="switchClass(this,'12')">
+            <span class="ctab-num">12<sup data-hi="वीं" data-en="th">वीं</sup></span>
+            <span class="ctab-lbl" data-hi="बोर्ड" data-en="Board">बोर्ड</span>
+          </button>
+          <button class="ctab" data-class="jee"  onclick="switchClass(this,'jee')">
+            <span class="ctab-num">JEE</span>
+            <span class="ctab-lbl">Mains/Adv</span>
+          </button>
+          <button class="ctab" data-class="neet" onclick="switchClass(this,'neet')">
+            <span class="ctab-num">NEET</span>
+            <span class="ctab-lbl">UG</span>
+          </button>
+        </div>
+        <div class="class-desc" id="classDesc"></div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="subjects-grid" id="subjectsGrid"></div>
+    </div>
+  </div>
+
+  <!-- ── SUBJECT DETAIL ── -->
+  <div id="page-subject" class="page">
+    <div class="subject-detail-header" id="subjectHero">
+      <div class="container">
+        <button class="back-btn" onclick="navigate('subjects')">← <span data-hi="वापस" data-en="Back">वापस</span></button>
+        <div class="subject-hero-info">
+          <div class="subject-hero-icon" id="subjectIcon"></div>
+          <div>
+            <h1 class="page-title" id="subjectTitle"></h1>
+            <p class="page-sub" id="subjectDesc"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="section-tabs" id="sectionTabs">
+        <button class="tab-btn active" data-section="notes"    onclick="switchTab(this,'notes')">📝 <span data-hi="नोट्स"    data-en="Notes">नोट्स</span></button>
+        <button class="tab-btn"        data-section="formulas" onclick="switchTab(this,'formulas')">📐 <span data-hi="फॉर्मूले" data-en="Formulas">फॉर्मूले</span></button>
+        <button class="tab-btn"        data-section="diagrams" onclick="switchTab(this,'diagrams')">🖼 <span data-hi="डायग्राम" data-en="Diagrams">डायग्राम</span></button>
+        <button class="tab-btn"        data-section="practice" onclick="switchTab(this,'practice')">✏️ <span data-hi="अभ्यास"   data-en="Practice">अभ्यास</span></button>
+      </div>
+      <div id="pdfPanels"></div>
+    </div>
+  </div>
+
+</main>
+
+<script src="script.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+  <title>Sign Up — Adhyayan Classes</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#e8611a"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="Adhyayan"/>
+  <link rel="apple-touch-icon" href="icons/icon-192.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#f6f4ef; --surface:#ffffff; --surface2:#f0ede6;
+      --border:#dedad2; --border2:#c8c3b8;
+      --text:#18160f; --text2:#544e44; --text3:#8a8278;
+      --accent:#e8611a; --accent2:#c94d0e;
+      --accent-soft:#fceee6; --accent-mid:#f0c4a8;
+      --red:#e53935; --green:#1d9e62; --green-soft:#e2f7ee;
+      --shadow:0 4px 20px rgba(30,20,10,.09);
+      --shadow-lg:0 10px 40px rgba(30,20,10,.14);
+      --font:'Sora','Noto Sans Devanagari',sans-serif;
+      --serif:'DM Serif Display',serif;
+    }
+    [data-theme="dark"] {
+      --bg:#0f0e09; --surface:#1a1810; --surface2:#232018;
+      --border:#2e2b22; --border2:#3a362c;
+      --text:#f0ebe2; --text2:#a89e90; --text3:#66604e;
+      --accent-soft:#2a160a; --accent-mid:#3d2010;
+      --green-soft:#091c12;
+      --shadow:0 4px 20px rgba(0,0,0,.4);
+      --shadow-lg:0 10px 40px rgba(0,0,0,.55);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:16px}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);
+      min-height:100vh;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;padding:1.5rem 1rem;overflow-x:hidden}
+    a{color:var(--accent);text-decoration:none;font-weight:600}
+    button{cursor:pointer;font-family:var(--font);-webkit-tap-highlight-color:transparent}
+
+    .auth-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+    .auth-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.16}
+    .orb-1{width:350px;height:350px;background:#ff8040;top:-100px;left:-80px}
+    .orb-2{width:280px;height:280px;background:var(--accent);bottom:-60px;right:-60px}
+
+    .auth-card{position:relative;z-index:1;width:100%;max-width:420px;
+      background:var(--surface);border-radius:22px;border:1px solid var(--border);
+      box-shadow:var(--shadow-lg);padding:2rem 1.75rem 1.75rem;
+      animation:slideUp .4s cubic-bezier(.32,1,.6,1) both}
+    @keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+    .auth-logo{display:flex;align-items:center;gap:.6rem;margin-bottom:1.3rem;justify-content:center}
+    .logo-mark{width:46px;height:46px;background:var(--accent);color:#fff;border-radius:13px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--serif);font-size:1.5rem;font-style:italic}
+    .logo-info .logo-text{font-size:1.15rem;font-weight:700;color:var(--text)}
+    .logo-info .logo-sub{font-size:.72rem;color:var(--text3)}
+
+    .student-badge{display:flex;align-items:center;justify-content:center;gap:.4rem;
+      background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-mid);
+      border-radius:8px;padding:.35rem .9rem;font-size:.78rem;font-weight:700;
+      margin:0 auto 1.3rem;width:fit-content}
+
+    .auth-heading{text-align:center;margin-bottom:1.4rem}
+    .auth-heading h1{font-family:var(--serif);font-size:1.7rem;color:var(--text);margin-bottom:.25rem}
+    .auth-heading p{font-size:.82rem;color:var(--text2)}
+
+    .form-group{margin-bottom:.9rem}
+    .form-label{display:block;font-size:.8rem;font-weight:600;color:var(--text2);margin-bottom:.42rem}
+    .form-input{width:100%;padding:.73rem 1rem;border:1.5px solid var(--border);border-radius:11px;
+      background:var(--surface2);font-family:var(--font);font-size:.9rem;color:var(--text);
+      transition:border-color .2s,box-shadow .2s;outline:none}
+    .form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);background:var(--surface)}
+    .form-input::placeholder{color:var(--text3)}
+    .pw-wrap{position:relative}
+    .pw-wrap .form-input{padding-right:2.8rem}
+    .pw-toggle{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);
+      background:none;border:none;font-size:1rem;color:var(--text3);padding:.2rem;line-height:1}
+    .pw-toggle:hover{color:var(--accent)}
+
+    /* password strength */
+    .pw-strength{margin-top:.4rem;display:flex;gap:.25rem;align-items:center}
+    .pw-bar{flex:1;height:3px;border-radius:99px;background:var(--border2);transition:background .3s}
+    .pw-label{font-size:.7rem;color:var(--text3);min-width:42px;text-align:right}
+    .s-weak  .pw-bar:nth-child(1){background:var(--red)}
+    .s-fair  .pw-bar:nth-child(1),.s-fair  .pw-bar:nth-child(2){background:#f5a623}
+    .s-good  .pw-bar:nth-child(1),.s-good  .pw-bar:nth-child(2),.s-good  .pw-bar:nth-child(3){background:var(--green)}
+
+    .btn-primary{width:100%;padding:.85rem 1.5rem;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:700;
+      display:flex;align-items:center;justify-content:center;gap:.5rem;
+      transition:opacity .2s,transform .15s,box-shadow .2s;
+      box-shadow:0 4px 15px rgba(232,97,26,.35);margin-top:1.2rem}
+    .btn-primary:hover{opacity:.92;transform:translateY(-1px)}
+    .btn-primary:active{transform:translateY(0)}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+    .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);
+      border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+    .spinner.show{display:block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .auth-msg{padding:.75rem 1rem;border-radius:10px;font-size:.82rem;font-weight:500;
+      margin-top:1rem;display:none;align-items:center;gap:.5rem}
+    .auth-msg.show{display:flex}
+    .auth-msg.error{background:#fdecea;color:var(--red);border:1px solid #f5c2c0}
+    .auth-msg.success{background:var(--green-soft);color:var(--green);border:1px solid #b3e6cf}
+    [data-theme="dark"] .auth-msg.error{background:#2a0d0c;border-color:#5c2020}
+    [data-theme="dark"] .auth-msg.success{background:#091c12;border-color:#1a4a2a}
+
+    .terms-row{display:flex;align-items:flex-start;gap:.55rem;margin-top:.9rem;
+      font-size:.78rem;color:var(--text2)}
+    .terms-row input[type="checkbox"]{margin-top:2px;accent-color:var(--accent);flex-shrink:0}
+
+    .auth-footer{text-align:center;margin-top:1.3rem;font-size:.82rem;color:var(--text2)}
+
+    .theme-toggle{position:fixed;top:1rem;right:1rem;z-index:10;
+      width:36px;height:36px;border-radius:50%;
+      border:1.5px solid var(--border);background:var(--surface);
+      font-size:.95rem;display:flex;align-items:center;justify-content:center;
+      box-shadow:var(--shadow)}
+  </style>
+</head>
+<body>
+
+<div class="auth-bg">
+  <div class="auth-orb orb-1"></div>
+  <div class="auth-orb orb-2"></div>
+</div>
+
+<button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="Theme">🌙</button>
+
+<div class="auth-card">
+  <div class="auth-logo">
+    <div class="logo-mark">अ</div>
+    <div class="logo-info">
+      <div class="logo-text">Adhyayan Classes</div>
+      <div class="logo-sub">Class 11 &amp; 12 Study Platform</div>
+    </div>
+  </div>
+
+  <div class="student-badge">🎓 Student Registration</div>
+
+  <div class="auth-heading">
+    <h1>Join Adhyayan</h1>
+    <p>नया student account बनाएं — बिल्कुल मुफ़्त</p>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="name">Full Name</label>
+    <input class="form-input" type="text" id="name" placeholder="आपका पूरा नाम" autocomplete="name"/>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="email">Email Address</label>
+    <input class="form-input" type="email" id="email" placeholder="you@example.com" autocomplete="email"/>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="password">Password</label>
+    <div class="pw-wrap">
+      <input class="form-input" type="password" id="password"
+        placeholder="कम से कम 6 characters" autocomplete="new-password"
+        oninput="checkStrength(this.value)"/>
+      <button class="pw-toggle" type="button" onclick="togglePw('password')">👁</button>
+    </div>
+    <div class="pw-strength" id="pwStrength">
+      <div class="pw-bar"></div>
+      <div class="pw-bar"></div>
+      <div class="pw-bar"></div>
+      <span class="pw-label" id="pwLabel"></span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="confirm">Confirm Password</label>
+    <div class="pw-wrap">
+      <input class="form-input" type="password" id="confirm"
+        placeholder="Password दोबारा लिखें" autocomplete="new-password"/>
+      <button class="pw-toggle" type="button" onclick="togglePw('confirm')">👁</button>
+    </div>
+  </div>
+
+  <label class="terms-row">
+    <input type="checkbox" id="terms"/>
+    <span>मैं Adhyayan Classes के Terms of Use से सहमत हूँ।</span>
+  </label>
+
+  <button class="btn-primary" id="signupBtn" onclick="doSignup()">
+    <span id="signupBtnText">Account बनाएं →</span>
+    <span class="spinner" id="signupSpinner"></span>
+  </button>
+
+  <div class="auth-msg" id="authMsg"></div>
+
+  <div class="auth-footer">
+    पहले से account है? <a href="login.html">Login करें</a>
+  </div>
+</div>
+
+<script type="module">
+  import { auth, db } from "./firebase.js";
+  import { createUserWithEmailAndPassword, onAuthStateChanged, updateProfile }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { doc, setDoc }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  onAuthStateChanged(auth, u => { if (u) location.href = "index.html"; });
+
+  const saved = localStorage.getItem('adhyayan-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('themeBtn').textContent = saved === 'dark' ? '☀️' : '🌙';
+
+  window.toggleTheme = () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('adhyayan-theme', next);
+    document.getElementById('themeBtn').textContent = next === 'dark' ? '☀️' : '🌙';
+  };
+
+  window.togglePw = id => {
+    const el = document.getElementById(id);
+    el.type = el.type === 'password' ? 'text' : 'password';
+  };
+
+  window.checkStrength = val => {
+    const el  = document.getElementById('pwStrength');
+    const lbl = document.getElementById('pwLabel');
+    el.className = 'pw-strength';
+    if (!val) { lbl.textContent = ''; return; }
+    if (val.length < 6)  { el.classList.add('s-weak'); lbl.textContent = 'Weak'; }
+    else if (val.length < 10) { el.classList.add('s-fair'); lbl.textContent = 'Fair'; }
+    else                  { el.classList.add('s-good'); lbl.textContent = 'Strong'; }
+  };
+
+  function showMsg(txt, type = 'error') {
+    const el = document.getElementById('authMsg');
+    el.textContent = (type === 'error' ? '⚠️ ' : '✅ ') + txt;
+    el.className = `auth-msg show ${type}`;
+  }
+
+  window.doSignup = async () => {
+    const name   = document.getElementById('name').value.trim();
+    const email  = document.getElementById('email').value.trim();
+    const pw     = document.getElementById('password').value;
+    const conf   = document.getElementById('confirm').value;
+    const agreed = document.getElementById('terms').checked;
+    document.getElementById('authMsg').className = 'auth-msg';
+
+    if (!name)           { showMsg('अपना नाम लिखें।'); return; }
+    if (!email)          { showMsg('Email address लिखें।'); return; }
+    if (pw.length < 6)   { showMsg('Password कम से कम 6 characters का हो।'); return; }
+    if (pw !== conf)     { showMsg('दोनों passwords match नहीं करते।'); return; }
+    if (!agreed)         { showMsg('Terms of Use से सहमत होना ज़रूरी है।'); return; }
+
+    const btn  = document.getElementById('signupBtn');
+    const spin = document.getElementById('signupSpinner');
+    const txt  = document.getElementById('signupBtnText');
+    btn.disabled = true; spin.classList.add('show'); txt.textContent = 'Creating…';
+
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pw);
+      await updateProfile(cred.user, { displayName: name });
+      await setDoc(doc(db, "users", email), {
+        email, name, role: "student", createdAt: new Date().toISOString()
+      });
+      sessionStorage.setItem('adhyayan-role', 'student');
+      showMsg('Account बन गया! Redirecting…', 'success');
+      setTimeout(() => location.href = "index.html", 900);
+    } catch(err) {
+      spin.classList.remove('show'); txt.textContent = 'Account बनाएं →'; btn.disabled = false;
+      const map = {
+        'auth/email-already-in-use':'यह email पहले से register है।',
+        'auth/invalid-email':       'Email का format सही नहीं है।',
+        'auth/weak-password':       'Password कम से कम 6 characters का होना चाहिए।',
+      };
+      showMsg(map[err.code] || 'Signup failed: ' + err.message);
+    }
+  };
+</script>
+</body>
+</html>

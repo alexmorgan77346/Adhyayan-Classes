@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="light" data-lang="hi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+  <title>Adhyayan Classes</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" id="themeColorMeta" content="#f6f4ef"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="Adhyayan"/>
+  <link rel="apple-touch-icon" href="icons/icon-192.png"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    /* ── Auth additions ── */
+    #authGuard{position:fixed;inset:0;z-index:10000;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .3s}
+    #authGuard.hidden{opacity:0;pointer-events:none;visibility:hidden}
+    .ag-inner{text-align:center}
+    .ag-logo{font-family:'DM Serif Display',serif;font-size:3.5rem;color:#e8611a;animation:pulse 1.2s ease-in-out infinite alternate}
+    @keyframes pulse{from{transform:scale(.92);opacity:.7}to{transform:scale(1.06);opacity:1}}
+    .ag-txt{font-size:.9rem;font-weight:600;margin-top:.5rem;color:#544e44}
+    .auth-user-badge{display:flex;align-items:center;gap:.4rem;padding:.28rem .65rem;border-radius:9px;background:var(--surface2);border:1.5px solid var(--border);font-size:.75rem;max-width:160px;overflow:hidden}
+    .auth-avatar{width:22px;height:22px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
+    .auth-role-tag{font-size:.7rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .role-admin{color:#c88a00}.role-student{color:var(--accent)}
+    .logout-btn{color:var(--text2)!important}
+    .logout-btn:hover{color:#e53935!important;border-color:#e53935!important;background:#fdecea!important}
+    .btn-lock-toggle{flex-shrink:0;padding:.35rem .65rem;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:.7rem;font-weight:700;color:var(--text2);transition:all .2s;white-space:nowrap;margin-left:.3rem}
+    .btn-lock-toggle.locked{border-color:#e53935;background:#fdecea;color:#e53935}
+    .pdf-card.is-locked{opacity:.65}
+    .pdf-card.is-locked .btn-open{pointer-events:none;background:var(--surface3)!important;color:var(--text3)!important;border-color:var(--border)!important;cursor:not-allowed}
+    .lock-badge{display:inline-flex;align-items:center;gap:.2rem;background:#fdecea;color:#e53935;border-radius:5px;font-size:.62rem;font-weight:700;padding:.1rem .38rem;margin-left:.25rem;vertical-align:middle}
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- AUTH GUARD -->
+<div id="authGuard">
+  <div class="ag-inner">
+    <div class="ag-logo">अ</div>
+    <div class="ag-txt">Checking login…</div>
+  </div>
+</div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-logo">अ</div>
+    <div class="loader-text">Adhyayan Classes</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+</div>
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="helpModal" onclick="closeModal('helpModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-row"><span class="modal-icon">❓</span><h3 class="modal-title" data-hi="सहायता" data-en="Help">सहायता</h3></div>
+      <button class="modal-close" onclick="closeModal('helpModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="help-item"><div class="help-icon">🎓</div><div><strong data-hi="कक्षा कैसे चुनें?" data-en="How to choose class?">कक्षा कैसे चुनें?</strong><p data-hi="विषय पेज पर ऊपर 11वीं / 12वीं / JEE / NEET बटन दबाएं।" data-en="On Subjects page, tap 11th / 12th / JEE / NEET button at the top.">विषय पेज पर ऊपर 11वीं / 12वीं / JEE / NEET बटन दबाएं।</p></div></div>
+      <div class="help-item"><div class="help-icon">📄</div><div><strong data-hi="PDF कैसे खोलें?" data-en="How to open PDF?">PDF कैसे खोलें?</strong><p data-hi="किसी भी PDF कार्ड पर टैप करें — नए tab में खुलेगा।" data-en="Tap any PDF card — it opens in a new tab.">किसी भी PDF कार्ड पर टैप करें — नए tab में खुलेगा।</p></div></div>
+      <div class="help-item"><div class="help-icon">📲</div><div><strong data-hi="App Install करें" data-en="Install as App">App Install करें</strong><p data-hi="Android: Chrome ⋮ → Add to Home Screen। iPhone: Share → Add to Home Screen।" data-en="Android: Chrome ⋮ → Add to Home Screen. iPhone: Share → Add to Home Screen.">Android: Chrome ⋮ → Add to Home Screen।</p></div></div>
+      <div class="help-item"><div class="help-icon">📞</div><div><strong data-hi="संपर्क" data-en="Contact">संपर्क</strong><p><a href="tel:6205034322">6205034322</a> / <a href="tel:7004904286">70049 04286</a></p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal" onclick="closeModal('settingsModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-row"><span class="modal-icon">⚙️</span><h3 class="modal-title" data-hi="सेटिंग्स" data-en="Settings">सेटिंग्स</h3></div>
+      <button class="modal-close" onclick="closeModal('settingsModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-label" data-hi="डार्क मोड" data-en="Dark Mode">डार्क मोड</div>
+          <div class="setting-sub" data-hi="आंखों के लिए आरामदायक" data-en="Easier on the eyes">आंखों के लिए आरामदायक</div>
+        </div>
+        <button class="toggle-pill" id="darkPill" onclick="toggleDark()"><span class="pill-knob"></span></button>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-label" data-hi="भाषा" data-en="Language">भाषा</div>
+          <div class="setting-sub" data-hi="हिंदी या English" data-en="Hindi or English">हिंदी या English</div>
+        </div>
+        <div class="lang-pill-wrap">
+          <button class="lang-pill active" id="pillHi" onclick="setLang('hi')">हिं</button>
+          <button class="lang-pill" id="pillEn" onclick="setLang('en')">EN</button>
+        </div>
+      </div>
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:.6rem">
+        <div class="setting-info">
+          <div class="setting-label" data-hi="डिफ़ॉल्ट कक्षा" data-en="Default Class">डिफ़ॉल्ट कक्षा</div>
+          <div class="setting-sub" data-hi="विषय पेज पर पहले कौन सी कक्षा दिखे" data-en="Which class appears first on Subjects page">विषय पेज पर पहले कौन सी कक्षा दिखे</div>
+        </div>
+        <div class="setting-class-grid" id="settingClassGrid">
+          <button class="scg-btn active" data-class="11"   onclick="setDefaultClass(this,'11')">11वीं</button>
+          <button class="scg-btn"        data-class="12"   onclick="setDefaultClass(this,'12')">12वीं</button>
+          <button class="scg-btn"        data-class="jee"  onclick="setDefaultClass(this,'jee')">JEE</button>
+          <button class="scg-btn"        data-class="neet" onclick="setDefaultClass(this,'neet')">NEET</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-label" data-hi="Cache साफ़ करें" data-en="Clear Cache">Cache साफ़ करें</div>
+          <div class="setting-sub" data-hi="Offline data हटाएं" data-en="Remove offline data">Offline data हटाएं</div>
+        </div>
+        <button class="btn-danger-sm" onclick="clearCache()"><span data-hi="साफ़ करें" data-en="Clear">साफ़ करें</span></button>
+      </div>
+      <div class="settings-app-info">
+        <span>Adhyayan Classes</span>
+        <span class="app-version">v3.0 · PWA</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <button class="nav-icon-btn nav-dots-btn" onclick="openSidebar()" title="Menu" id="dotsBtn">⋮</button>
+    <div class="nav-brand" onclick="navigate('home')">
+      <span class="brand-mark">अ</span>
+      <span class="brand-name" data-hi="अध्ययन" data-en="Adhyayan">अध्ययन</span>
+    </div>
+    <div class="nav-links">
+      <a class="nav-link active" data-page="home"     onclick="navigate('home')"     data-hi="होम"  data-en="Home">होम</a>
+      <a class="nav-link"        data-page="subjects" onclick="navigate('subjects')" data-hi="विषय" data-en="Subjects">विषय</a>
+    </div>
+    <div class="nav-actions"></div>
+  </div>
+</nav>
+
+<main id="app">
+
+  <!-- ═══════════ HOME ═══════════ -->
+  <div id="page-home" class="page active">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-bg">
+        <div class="hero-orb orb-1"></div>
+        <div class="hero-orb orb-2"></div>
+        <div class="grid-lines"></div>
+      </div>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          <span data-hi="अध्ययन क्लासेज · Class 11 &amp; 12" data-en="Adhyayan Classes · Class 11 &amp; 12">अध्ययन क्लासेज · Class 11 &amp; 12</span>
+        </div>
+        <h1 class="hero-title">
+          <span class="title-serif" data-hi="सीखे हंसते खेलते" data-en="Learn with Joy">सीखे हंसते खेलते</span>
+          <span class="title-main" data-hi="अध्ययन क्लासेज" data-en="Adhyayan Classes">अध्ययन क्लासेज</span>
+        </h1>
+        <p class="hero-sub"
+           data-hi="आपकी लगन + हमारी मेहनत = कामयाबी"
+           data-en="Your Dedication + Our Hardwork = Success">
+          आपकी लगन + हमारी मेहनत = कामयाबी
+        </p>
+        <div class="hero-cta">
+          <button class="btn-primary" onclick="navigate('subjects')" data-hi="विषय देखें →" data-en="Browse Subjects →">विषय देखें →</button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><span class="stat-num">6</span><span class="stat-lbl" data-hi="विषय" data-en="Subjects">विषय</span></div>
+          <div class="stat-divider"></div>
+          <div class="stat"><span class="stat-num">4</span><span class="stat-lbl" data-hi="कक्षाएं" data-en="Classes">कक्षाएं</span></div>
+          <div class="stat-divider"></div>
+          <div class="stat"><span class="stat-num" data-hi="मुफ़्त" data-en="Free">मुफ़्त</span><span class="stat-lbl" data-hi="हमेशा" data-en="Always">हमेशा</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="about-section">
+      <div class="container">
+        <div class="section-hdr">
+          <h2 class="section-title" data-hi="हमारे बारे में" data-en="About Us">हमारे बारे में</h2>
+        </div>
+        <div class="tagline-banner">
+          <span data-hi="✨ आपकी लगन + हमारी मेहनत = कामयाबी ✨" data-en="✨ Your Dedication + Our Hardwork = Success ✨">✨ आपकी लगन + हमारी मेहनत = कामयाबी ✨</span>
+        </div>
+        <div class="about-grid">
+          <!-- Institute card -->
+          <div class="about-card">
+            <div class="about-card-hdr">
+              <div class="about-big-icon">🏫</div>
+              <div>
+                <div class="about-card-title" data-hi="अध्ययन क्लासेज" data-en="Adhyayan Classes">अध्ययन क्लासेज</div>
+                <div class="about-card-sub" data-hi="बेगूसराय, बिहार" data-en="Begusarai, Bihar">बेगूसराय, बिहार</div>
+              </div>
+            </div>
+            <div class="about-motto" data-hi="सीखे हंसते खेलते" data-en="Learn with Joy">सीखे हंसते खेलते</div>
+            <div class="info-rows">
+              <div class="info-row"><span class="ir-icon">📞</span><div><div class="ir-label" data-hi="मोबाइल" data-en="Mobile">मोबाइल</div><div class="ir-val"><a href="tel:6205034322">6205034322</a> / <a href="tel:7004904286">70049 04286</a></div></div></div>
+              <div class="info-row"><span class="ir-icon">📚</span><div><div class="ir-label" data-hi="कक्षाएं" data-en="Classes">कक्षाएं</div><div class="ir-val">11th &amp; 12th — PHY · CHEM · BIO · MATHS · HIN · ENG</div></div></div>
+              <div class="info-row"><span class="ir-icon">🎓</span><div><div class="ir-label" data-hi="नामांकन" data-en="Admission">नामांकन</div><div class="ir-val" style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap"><span class="admission-badge" data-hi="खुला है" data-en="OPEN">खुला है</span><span data-hi="12वीं नया बैच: 02-01-2026" data-en="12th New Batch: 02-01-2026">12वीं नया बैच: 02-01-2026</span></div></div></div>
+              <div class="info-row"><span class="ir-icon">📍</span><div><div class="ir-label" data-hi="पता" data-en="Address">पता</div><div class="ir-val" data-hi="पुरानी दुर्गा स्थान, बलिया बाजार, बेगूसराय — 851211" data-en="Purani Durga Sthan, Baliya Bazar, Begusarai — 851211">पुरानी दुर्गा स्थान, बलिया बाजार, बेगूसराय — 851211</div></div></div>
+            </div>
+            <a href="https://maps.google.com/?q=Baliya+Bazar+Begusarai+Bihar" target="_blank" class="map-btn">📍 <span data-hi="Google Maps पर देखें" data-en="View on Maps">Google Maps पर देखें</span></a>
+          </div>
+
+          <!-- Right col -->
+          <div class="about-right-col">
+            <!-- Results -->
+            <div class="about-card">
+              <div class="result-hdr"><span class="trophy-icon">🏆</span><div><div class="about-card-title" data-hi="2025 परिणाम" data-en="2025 Results">2025 परिणाम</div><div class="about-card-sub" data-hi="हमारे टॉपर्स" data-en="Our Toppers">हमारे टॉपर्स</div></div></div>
+              <div class="toppers-list">
+                <div class="topper-row"><div class="topper-rank gold">1</div><div class="topper-info"><div class="topper-name">Shivam Kumar</div><div class="topper-score" data-hi="नं॰ 458" data-en="No. 458">नं॰ 458</div></div><div class="topper-medal">🥇</div></div>
+                <div class="topper-row"><div class="topper-rank silver">2</div><div class="topper-info"><div class="topper-name">Md Adil</div><div class="topper-score" data-hi="नं॰ 455" data-en="No. 455">नं॰ 455</div></div><div class="topper-medal">🥈</div></div>
+              </div>
+            </div>
+            <!-- Team -->
+            <div class="about-card">
+              <div class="about-card-title" style="margin-bottom:.9rem" data-hi="आगाज़ 2.0 — हमारी टीम" data-en="Aagaaz 2.0 — Our Team">आगाज़ 2.0 — हमारी टीम</div>
+              <div class="team-list">
+                <div class="team-row"><div class="team-avatar av-orange">S</div><div><div class="team-name">Shayan Akhtar</div><div class="team-role">D.R. — Director</div></div></div>
+                <div class="team-row"><div class="team-avatar av-blue">M</div><div><div class="team-name">Mohit Kumar</div><div class="team-role">M.D. — Managing Director</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ═══════════ SUBJECTS PAGE ═══════════ -->
+  <div id="page-subjects" class="page">
+    <div class="subjects-header">
+      <div class="container">
+        <h1 class="page-title" data-hi="विषय" data-en="Subjects">विषय</h1>
+        <!-- Class selector tabs always visible -->
+        <div class="class-tabs-row">
+          <button class="ctab active" data-class="11"   onclick="switchClass(this,'11')">
+            <span class="ctab-num">11<sup data-hi="वीं" data-en="th">वीं</sup></span>
+            <span class="ctab-lbl" data-hi="बोर्ड" data-en="Board">बोर्ड</span>
+          </button>
+          <button class="ctab" data-class="12"   onclick="switchClass(this,'12')">
+            <span class="ctab-num">12<sup data-hi="वीं" data-en="th">वीं</sup></span>
+            <span class="ctab-lbl" data-hi="बोर्ड" data-en="Board">बोर्ड</span>
+          </button>
+          <button class="ctab" data-class="jee"  onclick="switchClass(this,'jee')">
+            <span class="ctab-num">JEE</span>
+            <span class="ctab-lbl">Mains/Adv</span>
+          </button>
+          <button class="ctab" data-class="neet" onclick="switchClass(this,'neet')">
+            <span class="ctab-num">NEET</span>
+            <span class="ctab-lbl">UG</span>
+          </button>
+        </div>
+        <div class="class-desc" id="classDesc"></div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="subjects-grid" id="subjectsGrid"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SUBJECT DETAIL ═══════════ -->
+  <div id="page-subject" class="page">
+    <div class="subject-detail-header" id="subjectHero">
+      <div class="container">
+        <button class="back-btn" onclick="navigate('subjects')">← <span data-hi="वापस" data-en="Back">वापस</span></button>
+        <div class="subject-hero-info">
+          <div class="subject-hero-icon" id="subjectIcon"></div>
+          <div>
+            <h1 class="page-title" id="subjectTitle"></h1>
+            <p class="page-sub" id="subjectDesc"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="section-tabs" id="sectionTabs">
+        <button class="tab-btn active" data-section="notes"    onclick="switchTab(this,'notes')">📝 <span data-hi="नोट्स"    data-en="Notes">नोट्स</span></button>
+        <button class="tab-btn"        data-section="formulas" onclick="switchTab(this,'formulas')">📐 <span data-hi="फॉर्मूले" data-en="Formulas">फॉर्मूले</span></button>
+        <button class="tab-btn"        data-section="diagrams" onclick="switchTab(this,'diagrams')">🖼 <span data-hi="डायग्राम" data-en="Diagrams">डायग्राम</span></button>
+        <button class="tab-btn"        data-section="practice" onclick="switchTab(this,'practice')">✏️ <span data-hi="अभ्यास"   data-en="Practice">अभ्यास</span></button>
+      </div>
+      <div id="pdfPanels"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">
+      <span class="brand-mark" style="width:34px;height:34px;font-size:.95rem">अ</span>
+      <span style="font-weight:700;font-size:.95rem">Adhyayan Classes</span>
+    </div>
+    <button class="sidebar-close" onclick="closeSidebar()" aria-label="Close">✕</button>
+  </div>
+
+  <!-- User info injected here by auth JS -->
+  <div class="sidebar-user" id="sidebarUser">
+    <div class="sidebar-user-placeholder">
+      <div class="sidebar-avatar-lg">अ</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-username">Loading…</div>
+        <div class="sidebar-role-tag">—</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Navigate</div>
+    <button class="sidebar-item" onclick="navigate('home');closeSidebar()">
+      <span class="si-icon">🏠</span>
+      <span data-hi="होम" data-en="Home">होम</span>
+    </button>
+    <button class="sidebar-item" onclick="navigate('subjects');closeSidebar()">
+      <span class="si-icon">📚</span>
+      <span data-hi="विषय" data-en="Subjects">विषय</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-nav">
+    <div class="sidebar-section-label">Options</div>
+    <button class="sidebar-item" onclick="openModal('settingsModal');closeSidebar()">
+      <span class="si-icon">⚙️</span>
+      <span data-hi="सेटिंग्स" data-en="Settings">सेटिंग्स</span>
+    </button>
+    <button class="sidebar-item" onclick="openModal('helpModal');closeSidebar()">
+      <span class="si-icon">❓</span>
+      <span data-hi="सहायता" data-en="Help">सहायता</span>
+    </button>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <!-- Logout injected by auth JS -->
+  <div id="sidebarLogout" class="sidebar-nav"></div>
+
+  <div style="margin-top:auto;padding:1.2rem 1.1rem;font-size:.7rem;color:var(--text3);text-align:center">
+    Adhyayan Classes · <span style="background:var(--accent-soft);color:var(--accent);padding:.1rem .4rem;border-radius:4px;font-weight:700">v3.0 PWA</span>
+  </div>
+</aside>
+
+<!-- ═══════════ PDF VIEWER (PDF.js canvas) ═══════════ -->
+<div class="pdf-viewer-wrap" id="pdfViewerWrap">
+
+  <!-- Top bar -->
+  <div class="pdf-viewer-bar">
+    <button class="pdf-close-btn" onclick="closePdfViewer()" aria-label="Close">
+      <span>✕</span>
+      <span class="pv-close-label">बंद करें</span>
+    </button>
+    <div class="pdf-viewer-title" id="pdfViewerTitle">PDF</div>
+    <a class="pdf-ext-btn" id="pdfViewerExtLink" href="#" target="_blank" rel="noopener" title="Browser में खोलें">
+      ⤴<span class="pv-ext-label"> Open</span>
+    </a>
+  </div>
+
+  <!-- Controls bar -->
+  <div class="pdf-controls-bar" id="pdfControlsBar">
+    <button class="pdf-ctrl-btn" id="pdfPrevBtn" onclick="pdfPrevPage()" disabled>‹</button>
+    <div class="pdf-page-info">
+      <span id="pdfPageNum">—</span>
+      <span class="pdf-page-sep">/</span>
+      <span id="pdfPageCount">—</span>
+    </div>
+    <button class="pdf-ctrl-btn" id="pdfNextBtn" onclick="pdfNextPage()" disabled>›</button>
+    <div class="pdf-zoom-group">
+      <button class="pdf-ctrl-btn pdf-zoom-btn" onclick="pdfZoomOut()">−</button>
+      <span class="pdf-zoom-label" id="pdfZoomLabel">100%</span>
+      <button class="pdf-ctrl-btn pdf-zoom-btn" onclick="pdfZoomIn()">+</button>
+    </div>
+  </div>
+
+  <!-- Canvas scroll area -->
+  <div class="pdf-canvas-wrap" id="pdfCanvasWrap">
+    <div class="pdf-loading" id="pdfLoading">
+      <div class="pdf-spinner"></div>
+      <div class="pdf-loading-text">PDF लोड हो रही है…</div>
+    </div>
+    <div class="pdf-load-error" id="pdfLoadError">
+      <div class="pdf-err-icon">⚠️</div>
+      <div class="pdf-err-title">PDF नहीं खुली</div>
+      <div class="pdf-err-sub">File मिली नहीं या network error।</div>
+      <a class="pvf-open-btn" id="pdfErrLink" href="#" target="_blank" rel="noopener">🌐 Browser में खोलें</a>
+    </div>
+    <canvas id="pdfCanvas"></canvas>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script type="module">
+/* ============================================================
+   ADHYAYAN — Auth Integration (index.html)
+   ============================================================ */
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc, updateDoc, onSnapshot, setDoc }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+window.ADHYAYAN_ROLE = 'student';
+window.LOCK_STATES   = {};
+
+// ── Guard ────────────────────────────────────────────────────
+onAuthStateChanged(auth, async user => {
+  if (!user) { location.href = "login.html"; return; }
+
+  window.ADHYAYAN_USER = user;
+  let role = sessionStorage.getItem('adhyayan-role') || 'student';
+  try {
+    const snap = await getDoc(doc(db, "users", user.email));
+    if (snap.exists()) role = snap.data().role || 'student';
+  } catch(e) {}
+  window.ADHYAYAN_ROLE = role;
+  sessionStorage.setItem('adhyayan-role', role);
+
+  // Hide guard
+  document.getElementById('authGuard').classList.add('hidden');
+
+  // Inject navbar badge + logout
+  injectNavAuth(user, role);
+
+  // Patch pdfCardHTML to support locks
+  patchPdfCards(role);
+
+  // Live lock state listener
+  listenLocks();
+});
+
+// ── Navbar badge + logout ────────────────────────────────────
+function injectNavAuth(user, role) {
+  // Inject user info into sidebar
+  const sidebarUser = document.getElementById('sidebarUser');
+  if (sidebarUser) {
+    const initial = (user.displayName || user.email)[0].toUpperCase();
+    const displayName = user.displayName || user.email.split('@')[0];
+    sidebarUser.innerHTML = `
+      <div class="sidebar-user-placeholder">
+        <div class="sidebar-avatar-lg">${initial}</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-username">${displayName}</div>
+          <div class="sidebar-role-tag ${role === 'admin' ? 'role-admin' : 'role-student'}">
+            ${role === 'admin' ? '👑 Admin' : '🎓 Student'}
+          </div>
+          <div class="sidebar-email">${user.email}</div>
+        </div>
+      </div>`;
+  }
+
+  // Inject logout button into sidebar
+  const sidebarLogout = document.getElementById('sidebarLogout');
+  if (sidebarLogout) {
+    sidebarLogout.innerHTML = `
+      <div class="sidebar-section-label">Account</div>
+      <button class="sidebar-item sidebar-logout" onclick="doLogout()">
+        <span class="si-icon">⏏️</span>
+        <span>Logout</span>
+      </button>`;
+  }
+
+  window.doLogout = async () => {
+    await signOut(auth);
+    sessionStorage.removeItem('adhyayan-role');
+    location.href = "login.html";
+  };
+}
+
+// ── Firestore lock state listener ────────────────────────────
+function listenLocks() {
+  onSnapshot(doc(db, "settings", "pdfLocks"), snap => {
+    window.LOCK_STATES = snap.exists() ? (snap.data() || {}) : {};
+    // Re-render if on subject page
+    const p = document.getElementById('page-subject');
+    if (p && p.classList.contains('active') && window.currentSubject) {
+      window.renderPDFPanels(
+        window.currentSubject.id,
+        window.currentSubject.classKey,
+        window.currentSection || 'notes'
+      );
+    }
+  });
+}
+
+// ── Patch pdfCardHTML ─────────────────────────────────────────
+function patchPdfCards(role) {
+  window.pdfCardHTML = function(pdf, index, showClassBadge = false) {
+    const lockKey  = pdf.href.replace(/[^a-zA-Z0-9]/g, '_');
+    const isLocked = window.LOCK_STATES[lockKey] === true;
+    const lang     = localStorage.getItem('adhyayan-lang') || 'hi';
+    const name     = lang === 'hi' ? (pdf.nameHi || pdf.name) : pdf.name;
+
+    const classBadge = showClassBadge && pdf._class
+      ? `<span style="display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:.62rem;font-weight:700;padding:.1rem .42rem;border-radius:4px;margin-right:.35rem;">${pdf._class === '11' ? (lang==='hi'?'11वीं':'11th') : (lang==='hi'?'12वीं':'12th')}</span>`
+      : '';
+
+    const lockBadge = isLocked
+      ? `<span class="lock-badge">🔒 Locked</span>`
+      : '';
+
+    const openBtn = isLocked
+      ? `<span class="btn-open" style="cursor:not-allowed;opacity:.55;background:var(--surface3);color:var(--text3);">🔒 Locked</span>`
+      : `<button class="btn-open" onclick="openPdfViewer('${pdf.href}','${name.replace(/'/g,"\\'")}',event)">${lang==='hi'?'खोलें':'Open'} →</button>`;
+
+    const adminBtn = role === 'admin'
+      ? `<button class="btn-lock-toggle ${isLocked ? 'locked' : ''}"
+           onclick="window.togglePdfLock('${lockKey}')"
+           title="${isLocked ? 'Unlock PDF' : 'Lock PDF'}">
+           ${isLocked ? '🔓 Unlock' : '🔒 Lock'}
+         </button>`
+      : '';
+
+    return `
+      <div class="pdf-card ${isLocked ? 'is-locked' : ''}" style="animation-delay:${index*.035}s">
+        <div class="pdf-icon">📄</div>
+        <div class="pdf-info">
+          <div class="pdf-name" title="${name}">${classBadge}${name}${lockBadge}</div>
+          <div class="pdf-meta">PDF</div>
+        </div>
+        <div class="pdf-card-actions">
+          ${openBtn}
+          ${adminBtn}
+        </div>
+      </div>`;
+  };
+}
+
+// ── Toggle lock in Firestore ──────────────────────────────────
+window.togglePdfLock = async lockKey => {
+  if (window.ADHYAYAN_ROLE !== 'admin') return;
+  const newVal = !(window.LOCK_STATES[lockKey] === true);
+  try {
+    const ref  = doc(db, "settings", "pdfLocks");
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      await updateDoc(ref, { [lockKey]: newVal });
+    } else {
+      await setDoc(ref, { [lockKey]: newVal });
+    }
+  } catch(e) { console.error('Lock error:', e); }
+};
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+</script>
+</body>
+</html>
