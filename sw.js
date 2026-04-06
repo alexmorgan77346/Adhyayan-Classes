@@ -2,7 +2,7 @@
    ADHYAYAN CLASSES — sw.js  (Service Worker)
    ========================================== */
 
-const CACHE_NAME = 'adhyayan-v10';
+const CACHE_NAME = 'adhyayan-v11';
 
 const PRECACHE = [
   './',
