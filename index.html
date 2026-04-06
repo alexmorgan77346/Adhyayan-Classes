@@ -371,6 +371,10 @@
       <span class="si-icon">📚</span>
       <span data-hi="विषय" data-en="Subjects">विषय</span>
     </button>
+    <button class="sidebar-item" onclick="navigate('home');closeSidebar();setTimeout(()=>{const el=document.querySelector('.about-section');if(el)el.scrollIntoView({behavior:'smooth'})},320)">
+      <span class="si-icon">🏫</span>
+      <span data-hi="हमारे बारे में" data-en="About Us">हमारे बारे में</span>
+    </button>
   </nav>
 
   <div class="sidebar-divider"></div>
@@ -410,15 +414,19 @@
       <div class="pv-subtitle" id="pdfViewerSubtitle">Document</div>
     </div>
     <div class="pv-bar-actions">
+      <div class="pv-page-pill" style="font-size:.78rem;font-weight:700;padding:.28rem .65rem;background:var(--surface2);border-radius:8px;display:flex;align-items:center;gap:.25rem;color:var(--text)">
+        <span id="pdfPageNum">—</span>
+        <span style="opacity:.45">/</span>
+        <span id="pdfPageCount">—</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.15rem;background:var(--surface2);border-radius:8px;padding:.22rem .3rem;">
+        <button class="pv-zoom-btn" onclick="pdfZoomOut()" style="width:26px;height:26px;font-size:1rem;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--text);cursor:pointer;border-radius:6px;">−</button>
+        <span class="pv-zoom-label" id="pdfZoomLabel" style="font-size:.72rem;font-weight:700;min-width:36px;text-align:center;color:var(--text)">100%</span>
+        <button class="pv-zoom-btn" onclick="pdfZoomIn()" style="width:26px;height:26px;font-size:1rem;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--text);cursor:pointer;border-radius:6px;">+</button>
+      </div>
       <a class="pv-action-btn pv-dl" id="pdfDownloadBtn" href="#" download title="Download">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </a>
-      <button class="pv-action-btn" onclick="pdfRotate()" title="Rotate">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-      </button>
-      <button class="pv-action-btn pv-fs-btn" id="pdfFsBtn" onclick="pdfToggleFullscreen()" title="Fullscreen">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
-      </button>
       <a class="pv-action-btn" id="pdfViewerExtLink" href="#" target="_blank" rel="noopener" title="Browser में खोलें">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </a>
@@ -431,23 +439,9 @@
       <button class="pv-nav-btn" id="pdfPrevBtn" onclick="pdfPrevPage()" disabled>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <div class="pv-page-pill">
-        <span id="pdfPageNum">—</span>
-        <span class="pv-sep">/</span>
-        <span id="pdfPageCount">—</span>
-      </div>
       <button class="pv-nav-btn" id="pdfNextBtn" onclick="pdfNextPage()" disabled>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
-    </div>
-    <button class="pv-orient-btn" id="pdfOrientBtn" onclick="pdfToggleOrientation()" title="Portrait / Landscape">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-      <span id="pdfOrientLabel">Portrait</span>
-    </button>
-    <div class="pv-zoom-group">
-      <button class="pv-zoom-btn" onclick="pdfZoomOut()">−</button>
-      <span class="pv-zoom-label" id="pdfZoomLabel">100%</span>
-      <button class="pv-zoom-btn" onclick="pdfZoomIn()">+</button>
     </div>
   </div>
 
