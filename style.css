@@ -495,13 +495,13 @@ img { max-width: 100%; display: block }
 .sidebar-overlay.open { opacity: 1; visibility: visible }
 
 .sidebar {
-  position: fixed; top: 0; right: 0; bottom: 0; z-index: 901;
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 901;
   width: min(300px, 88vw);
   background: var(--surface);
-  border-left: 1px solid var(--border);
-  box-shadow: -10px 0 48px rgba(0,0,0,.18);
+  border-right: 1px solid var(--border);
+  box-shadow: 10px 0 48px rgba(0,0,0,.18);
   display: flex; flex-direction: column;
-  transform: translateX(102%);
+  transform: translateX(-102%);
   transition: transform .32s cubic-bezier(.32,1,.6,1);
   overflow-y: auto; overflow-x: hidden;
   padding-top: var(--safe-top);
