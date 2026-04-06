@@ -185,6 +185,17 @@
     </div>
   </div>
 
+  <div class="form-group">
+    <label class="form-label" for="inviteCode">Invite Code <span style="color:var(--red)">*</span></label>
+    <input class="form-input" type="text" id="inviteCode"
+      placeholder="आपका invite code यहाँ लिखें"
+      autocomplete="off" spellcheck="false"
+      style="letter-spacing:.08em;font-weight:600;text-transform:uppercase"/>
+    <div style="font-size:.72rem;color:var(--text3);margin-top:.3rem;">
+      Invite code न हो तो अपने teacher से लें।
+    </div>
+  </div>
+
   <label class="terms-row">
     <input type="checkbox" id="terms"/>
     <span>मैं Adhyayan Classes के Terms of Use से सहमत हूँ।</span>
@@ -206,7 +217,7 @@
   import { auth, db } from "./firebase.js";
   import { createUserWithEmailAndPassword, onAuthStateChanged, updateProfile }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { doc, setDoc }
+  import { doc, setDoc, getDoc }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   onAuthStateChanged(auth, u => { if (u) location.href = "index.html"; });
@@ -248,6 +259,7 @@
     const email  = document.getElementById('email').value.trim();
     const pw     = document.getElementById('password').value;
     const conf   = document.getElementById('confirm').value;
+    const code   = document.getElementById('inviteCode').value.trim().toUpperCase();
     const agreed = document.getElementById('terms').checked;
     document.getElementById('authMsg').className = 'auth-msg';
 
@@ -255,18 +267,39 @@
     if (!email)          { showMsg('Email address लिखें।'); return; }
     if (pw.length < 6)   { showMsg('Password कम से कम 6 characters का हो।'); return; }
     if (pw !== conf)     { showMsg('दोनों passwords match नहीं करते।'); return; }
+    if (!code)           { showMsg('Invite code लिखें।'); return; }
     if (!agreed)         { showMsg('Terms of Use से सहमत होना ज़रूरी है।'); return; }
 
     const btn  = document.getElementById('signupBtn');
     const spin = document.getElementById('signupSpinner');
     const txt  = document.getElementById('signupBtnText');
-    btn.disabled = true; spin.classList.add('show'); txt.textContent = 'Creating…';
+    btn.disabled = true; spin.classList.add('show'); txt.textContent = 'Checking code…';
+
+    // ── Validate invite code ──────────────────────────────────
+    try {
+      const codeSnap = await getDoc(doc(db, "inviteCodes", code));
+      if (!codeSnap.exists()) {
+        spin.classList.remove('show'); txt.textContent = 'Account बनाएं →'; btn.disabled = false;
+        showMsg('यह invite code सही नहीं है।'); return;
+      }
+      if (codeSnap.data().active === false) {
+        spin.classList.remove('show'); txt.textContent = 'Account बनाएं →'; btn.disabled = false;
+        showMsg('यह invite code अभी active नहीं है।'); return;
+      }
+    } catch(err) {
+      spin.classList.remove('show'); txt.textContent = 'Account बनाएं →'; btn.disabled = false;
+      showMsg('Code verify नहीं हो पाया। Network check करें।'); return;
+    }
+
+    txt.textContent = 'Creating…';
 
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, pw);
       await updateProfile(cred.user, { displayName: name });
       await setDoc(doc(db, "users", email), {
-        email, name, role: "student", createdAt: new Date().toISOString()
+        email, name, role: "student",
+        inviteCode: code,
+        createdAt: new Date().toISOString()
       });
       sessionStorage.setItem('adhyayan-role', 'student');
       showMsg('Account बन गया! Redirecting…', 'success');
