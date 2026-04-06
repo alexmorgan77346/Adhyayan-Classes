@@ -287,6 +287,56 @@
     </div>
   </div>
 
+  <!-- ═══════════ ADMIN PANEL ═══════════ -->
+  <div id="page-admin" class="page">
+    <div class="subjects-header">
+      <div class="container">
+        <h1 class="page-title">👑 Admin Panel</h1>
+        <p style="font-size:.82rem;color:var(--text3);margin-top:.3rem;">Invite codes manage करें</p>
+      </div>
+    </div>
+    <div class="container" style="padding-top:1.2rem;padding-bottom:3rem;">
+
+      <!-- Add new code -->
+      <div class="about-card" style="margin-bottom:1.2rem;">
+        <div class="about-card-title" style="margin-bottom:1rem;">➕ नया Invite Code बनाएं</div>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">
+          <div style="flex:1;min-width:160px;">
+            <label style="font-size:.75rem;font-weight:600;color:var(--text2);display:block;margin-bottom:.35rem;">Code</label>
+            <input id="newCodeInput" type="text" placeholder="जैसे: BATCH2025A"
+              style="width:100%;padding:.7rem 1rem;border:1.5px solid var(--border);border-radius:10px;
+                     background:var(--surface2);font-family:var(--font);font-size:.88rem;color:var(--text);
+                     outline:none;text-transform:uppercase;letter-spacing:.06em;font-weight:700;"
+              oninput="this.value=this.value.toUpperCase()"/>
+          </div>
+          <button onclick="adminAddCode()"
+            style="padding:.7rem 1.4rem;background:linear-gradient(135deg,var(--accent),var(--accent2));
+                   color:#fff;border:none;border-radius:10px;font-size:.88rem;font-weight:700;
+                   cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(232,97,26,.3);">
+            Code बनाएं
+          </button>
+        </div>
+        <div id="adminAddMsg" style="margin-top:.7rem;font-size:.8rem;font-weight:600;display:none;"></div>
+      </div>
+
+      <!-- Code list -->
+      <div class="about-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <div class="about-card-title">📋 सभी Invite Codes</div>
+          <button onclick="adminLoadCodes()"
+            style="padding:.35rem .8rem;border:1.5px solid var(--border);border-radius:8px;
+                   background:var(--surface2);font-size:.75rem;font-weight:600;color:var(--text2);cursor:pointer;">
+            🔄 Refresh
+          </button>
+        </div>
+        <div id="adminCodeList">
+          <div style="text-align:center;padding:2rem;color:var(--text3);font-size:.85rem;">Loading…</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </main>
 
 <!-- ═══════════ SIDEBAR ═══════════ -->
@@ -484,6 +534,18 @@ function injectNavAuth(user, role) {
       </div>`;
   }
 
+  // Admin nav link in sidebar
+  if (role === 'admin') {
+    const sidebarNav = document.querySelector('.sidebar-nav');
+    if (sidebarNav) {
+      const adminBtn = document.createElement('button');
+      adminBtn.className = 'sidebar-item';
+      adminBtn.innerHTML = '<span class="si-icon">👑</span><span>Admin Panel</span>';
+      adminBtn.onclick = () => { navigate('admin'); closeSidebar(); adminLoadCodes(); };
+      sidebarNav.appendChild(adminBtn);
+    }
+  }
+
   // Inject logout button into sidebar
   const sidebarLogout = document.getElementById('sidebarLogout');
   if (sidebarLogout) {
@@ -666,6 +728,118 @@ if (_origRender) {
     if (canvas) canvas.style.transform = `rotate(${_pdfRotation}deg)`;
   };
 }
+</script>
+
+<script type="module">
+/* ============================================================
+   ADMIN PANEL — Invite Code Manager
+   admin email: adhyayan@gmail.com
+   ============================================================ */
+import { db } from "./firebase.js";
+import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const ADMIN_EMAIL = 'adhyayan@gmail.com';
+
+function isAdmin() {
+  return window.ADHYAYAN_USER?.email === ADMIN_EMAIL;
+}
+
+// ── Load all codes ────────────────────────────────────────────
+window.adminLoadCodes = async () => {
+  if (!isAdmin()) return;
+  const list = document.getElementById('adminCodeList');
+  list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:.85rem;">Loading…</div>';
+  try {
+    const snap = await getDocs(collection(db, "inviteCodes"));
+    if (snap.empty) {
+      list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text3);font-size:.85rem;">कोई code नहीं है अभी।</div>';
+      return;
+    }
+    const codes = [];
+    snap.forEach(d => codes.push({ id: d.id, ...d.data() }));
+    codes.sort((a,b) => a.id.localeCompare(b.id));
+    list.innerHTML = codes.map(c => `
+      <div style="display:flex;align-items:center;gap:.6rem;padding:.75rem .9rem;
+                  border-radius:12px;background:var(--surface2);border:1.5px solid var(--border);
+                  margin-bottom:.55rem;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:.92rem;font-weight:800;letter-spacing:.06em;color:var(--text);font-family:monospace;">
+            ${c.id}
+          </div>
+          <div style="font-size:.72rem;color:var(--text3);margin-top:2px;">
+            ${c.createdAt ? new Date(c.createdAt).toLocaleDateString('hi-IN') : '—'}
+          </div>
+        </div>
+        <span style="padding:.22rem .65rem;border-radius:99px;font-size:.7rem;font-weight:700;
+                     background:${c.active !== false ? 'var(--green-soft)' : '#fdecea'};
+                     color:${c.active !== false ? 'var(--green)' : 'var(--red)'};">
+          ${c.active !== false ? '✓ Active' : '✗ Inactive'}
+        </span>
+        <button onclick="adminToggleCode('${c.id}', ${c.active !== false})"
+          style="padding:.35rem .7rem;border-radius:8px;font-size:.72rem;font-weight:700;cursor:pointer;
+                 border:1.5px solid var(--border);background:var(--surface);color:var(--text2);">
+          ${c.active !== false ? 'Deactivate' : 'Activate'}
+        </button>
+        <button onclick="adminDeleteCode('${c.id}')"
+          style="padding:.35rem .7rem;border-radius:8px;font-size:.72rem;font-weight:700;cursor:pointer;
+                 border:1.5px solid #e53935;background:#fdecea;color:#e53935;">
+          Delete
+        </button>
+      </div>`).join('');
+  } catch(e) {
+    list.innerHTML = `<div style="color:var(--red);font-size:.82rem;padding:1rem;">Error: ${e.message}</div>`;
+  }
+};
+
+// ── Add new code ──────────────────────────────────────────────
+window.adminAddCode = async () => {
+  if (!isAdmin()) return;
+  const input = document.getElementById('newCodeInput');
+  const msg   = document.getElementById('adminAddMsg');
+  const code  = input.value.trim().toUpperCase();
+  msg.style.display = 'none';
+
+  if (!code) {
+    msg.style.color = 'var(--red)'; msg.textContent = '⚠️ Code लिखें।'; msg.style.display = 'block'; return;
+  }
+  if (!/^[A-Z0-9_-]{3,20}$/.test(code)) {
+    msg.style.color = 'var(--red)'; msg.textContent = '⚠️ Only A-Z, 0-9, -, _ allowed (3-20 chars).'; msg.style.display = 'block'; return;
+  }
+
+  try {
+    await setDoc(doc(db, "inviteCodes", code), {
+      active: true,
+      createdAt: new Date().toISOString(),
+      createdBy: ADMIN_EMAIL
+    });
+    input.value = '';
+    msg.style.color = 'var(--green)'; msg.textContent = `✅ "${code}" बन गया!`; msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 2500);
+    adminLoadCodes();
+  } catch(e) {
+    msg.style.color = 'var(--red)'; msg.textContent = '⚠️ ' + e.message; msg.style.display = 'block';
+  }
+};
+
+// ── Toggle active/inactive ────────────────────────────────────
+window.adminToggleCode = async (code, currentlyActive) => {
+  if (!isAdmin()) return;
+  try {
+    await updateDoc(doc(db, "inviteCodes", code), { active: !currentlyActive });
+    adminLoadCodes();
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+// ── Delete code ───────────────────────────────────────────────
+window.adminDeleteCode = async (code) => {
+  if (!isAdmin()) return;
+  if (!confirm(`"${code}" delete करना है?`)) return;
+  try {
+    await deleteDoc(doc(db, "inviteCodes", code));
+    adminLoadCodes();
+  } catch(e) { alert('Error: ' + e.message); }
+};
 </script>
 
 </body>
