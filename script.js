@@ -977,6 +977,11 @@ window.pdfPrevPage        = pdfPrevPage;
 window.pdfNextPage        = pdfNextPage;
 window.pdfZoomIn          = pdfZoomIn;
 window.pdfZoomOut         = pdfZoomOut;
+// Admin stubs (overridden by admin script module)
+window.adminLoadCodes     = window.adminLoadCodes  || function(){};
+window.adminAddCode       = window.adminAddCode    || function(){};
+window.adminToggleCode    = window.adminToggleCode || function(){};
+window.adminDeleteCode    = window.adminDeleteCode || function(){};
 
 // ── Auth integration: expose internals ───────────────────────
 window.pdfCardHTML     = pdfCardHTML;
