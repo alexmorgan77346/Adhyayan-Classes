@@ -128,7 +128,7 @@
     <button class="nav-icon-btn nav-dots-btn" onclick="openSidebar()" title="Menu" id="dotsBtn">⋮</button>
     <div class="nav-brand" onclick="navigate('home')">
       <span class="brand-mark">अ</span>
-      <span class="brand-name" data-hi="अध्ययन" data-en="Adhyayan">अध्ययन</span>
+      <span class="brand-name" data-hi="अध्ययन क्लासेज" data-en="Adhyayan Classes">अध्ययन क्लासेज</span>
     </div>
     <div class="nav-links">
       <a class="nav-link active" data-page="home"     onclick="navigate('home')"     data-hi="होम"  data-en="Home">होम</a>
@@ -472,6 +472,7 @@
 <script type="module">
 /* ============================================================
    ADHYAYAN — Auth Integration (index.html)
+   Fast cache-first + offline-safe auth
    ============================================================ */
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut }
@@ -482,29 +483,74 @@ import { doc, getDoc, updateDoc, onSnapshot, setDoc }
 window.ADHYAYAN_ROLE = 'student';
 window.LOCK_STATES   = {};
 
-// ── Guard ────────────────────────────────────────────────────
+const AUTH_CACHE_KEY = 'adhyayan-auth-cache';
+
+// ── Step 1: INSTANT — use localStorage cache to hide guard immediately ──
+const cached = (() => { try { return JSON.parse(localStorage.getItem(AUTH_CACHE_KEY)); } catch(e) { return null; } })();
+const isOffline = !navigator.onLine;
+
+if (cached && cached.email) {
+  // We have a cached session — show UI right away, no waiting
+  window.ADHYAYAN_USER = cached;           // partial user object (email, displayName)
+  window.ADHYAYAN_ROLE = cached.role || 'student';
+
+  document.getElementById('authGuard').classList.add('hidden');
+  injectNavAuth(cached, cached.role || 'student');
+  patchPdfCards(cached.role || 'student');
+
+  if (!isOffline) {
+    // Still run live auth in background to verify & refresh role
+    listenLocks();
+  }
+}
+
+// ── Step 2: Firebase auth listener (runs in background if cached, or blocks if not) ──
 onAuthStateChanged(auth, async user => {
-  if (!user) { location.href = "login.html"; return; }
+  if (!user) {
+    // Clear cache and redirect
+    localStorage.removeItem(AUTH_CACHE_KEY);
+    sessionStorage.removeItem('adhyayan-role');
+    location.href = "login.html";
+    return;
+  }
 
   window.ADHYAYAN_USER = user;
-  let role = sessionStorage.getItem('adhyayan-role') || 'student';
-  try {
-    const snap = await getDoc(doc(db, "users", user.email));
-    if (snap.exists()) role = snap.data().role || 'student';
-  } catch(e) {}
+
+  // Fetch fresh role (skip if offline — use cached)
+  let role = cached?.role || sessionStorage.getItem('adhyayan-role') || 'student';
+  if (!isOffline) {
+    try {
+      const snap = await getDoc(doc(db, "users", user.email));
+      if (snap.exists()) role = snap.data().role || 'student';
+    } catch(e) { /* network error — keep cached role */ }
+  }
+
   window.ADHYAYAN_ROLE = role;
   sessionStorage.setItem('adhyayan-role', role);
 
-  // Hide guard
+  // Persist to localStorage for next instant load
+  localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify({
+    email:       user.email,
+    displayName: user.displayName || '',
+    role:        role,
+    uid:         user.uid
+  }));
+
+  // If we already showed UI from cache, only update role-sensitive parts
+  if (cached && cached.email === user.email) {
+    // Silently update role if it changed (e.g. admin promoted)
+    if (role !== (cached.role || 'student')) {
+      window.ADHYAYAN_ROLE = role;
+      injectNavAuth(user, role);
+      patchPdfCards(role);
+    }
+    return; // UI already shown — done
+  }
+
+  // No cache was available — show UI now (first-ever load)
   document.getElementById('authGuard').classList.add('hidden');
-
-  // Inject navbar badge + logout
   injectNavAuth(user, role);
-
-  // Patch pdfCardHTML to support locks
   patchPdfCards(role);
-
-  // Live lock state listener
   listenLocks();
 });
 
@@ -554,6 +600,7 @@ function injectNavAuth(user, role) {
   window.doLogout = async () => {
     await signOut(auth);
     sessionStorage.removeItem('adhyayan-role');
+    localStorage.removeItem('adhyayan-auth-cache');
     location.href = "login.html";
   };
 }
